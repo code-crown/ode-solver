@@ -44,7 +44,7 @@ int main(void) {
     bmw5.lambda_fz0 = 1.000;
     bmw5.lambda_ky = 1.000;
 
-    double ky_fl = bmw5.pky1 * bmw5.fz0 * (2 * atan(bmw5.fz_fl/(bmw5.pky2 * bmw5.fz0 * bmw5.lambda_fz0))) * bmw5.lambda_ky;
+    double ky_fl = bmw5.pky1 * bmw5.fz0 * sin(2 * atan(bmw5.fz_fl/(bmw5.pky2 * bmw5.fz0 * bmw5.lambda_fz0))) * bmw5.lambda_ky;
     double ky_fr = bmw5.pky1 * bmw5.fz0 * sin(2 * atan(bmw5.fz_fr/(bmw5.pky2 * bmw5.fz0 * bmw5.lambda_fz0))) * bmw5.lambda_ky;
     double ky_rl = bmw5.pky1 * bmw5.fz0 * sin(2 * atan(bmw5.fz_rl/(bmw5.pky2 * bmw5.fz0 * bmw5.lambda_fz0))) * bmw5.lambda_ky;
     double ky_rr = bmw5.pky1 * bmw5.fz0 * sin(2 * atan(bmw5.fz_rr/(bmw5.pky2 * bmw5.fz0 * bmw5.lambda_fz0))) * bmw5.lambda_ky;
