@@ -1,5 +1,7 @@
-#include <stdio.h>
 #include <math.h>
+#include "odeslv.h"
+#include <stdio.h>
+
 
 struct parameters {
     const double mass;
@@ -20,10 +22,11 @@ struct parameters {
     double lambda_fz0;      // scale factor of nominal (rated) load
     double lambda_ky;        // scale factor of Fy cornering stiffness
 
+    double delta;
+    double velocity;
 };
 
-void stm(double dx[], double xk[], double velocity, double delta, struct parameters p);
-void ode4(double dt, double xk[], double velocity, double delta, struct parameters p);
+void stm(double t, const double x[], double dx[], void *parameters);
 
 int main(void) {
     struct parameters bmw5 = {
@@ -52,56 +55,38 @@ int main(void) {
     bmw5.c_alpha[0] = -(ky_fl + ky_fr);
     bmw5.c_alpha[1] = -(ky_rl + ky_rr);
 
-    double velocity = 10.00;    // input velocity of cog [m/s]
-    double delta = 0.20;        // input steering angle at axle front [rad]
+    bmw5.velocity = 10.00;    // input velocity of cog [m/s]
+    bmw5.delta = 0.20;        // input steering angle at axle front [rad]
+
     double xk[] = {0.00, 0.00};
+    double time = 0.000;
+    double dt = 0.1;
 
-    double dt = 0.001;
-
-    for (int i = 0; i < 1000; i++) {
-        ode4(dt, xk, velocity, delta, bmw5);
-
-        printf("yaw rate: %f\t sideslip angle: %f\n", xk[0], xk[1]);
+    for (int i = 0; i <= 10; i++) {
+        ode4(stm, time, xk, 2, dt, &bmw5);
+        printf("yaw rate: %f\t sideslip angle: %f\t time: %f\n", xk[0], xk[1], time);
+        time += dt;
     };
 }
 
-void stm(double dx[], double xk[], double velocity, double delta, struct parameters p) {
+void stm(double t, const double x[], double dx[], void *parameters) {
+    struct parameters *p = (struct parameters *)parameters;
+
     // system behavior
-    double a11 = -(p.c_alpha[0] * pow(p.l_f,2) + p.c_alpha[1] * pow(p.l_r,2))/(velocity * p.inertia_z);
-    double a12 = -(p.c_alpha[0] - p.c_alpha[1])/(velocity * p.inertia_z);
-    double a21 = -1.0 - (p.c_alpha[0] * p.l_f - p.c_alpha[1] * p.l_r)/(pow(velocity,2) * p.mass);
-    double a22 = -(p.c_alpha[0]+ p.c_alpha[1])/(velocity * p.mass);
+    double a11 = -(p->c_alpha[0] * pow(p->l_f,2) + p->c_alpha[1] * pow(p->l_r,2))/(p->velocity * p->inertia_z);
+    double a12 = -(p->c_alpha[0] - p->c_alpha[1])/(p->velocity * p->inertia_z);
+    double a21 = -1.0 - (p->c_alpha[0] * p->l_f - p->c_alpha[1] * p->l_r)/(pow(p->velocity,2) * p->mass);
+    double a22 = -(p->c_alpha[0]+ p->c_alpha[1])/(p->velocity * p->mass);
 
     double a[] = {a11, a12, a21, a22};
 
     // control array
-    double b11 = p.c_alpha[0] * p.l_f / p.inertia_z;
-    double b21 = p.c_alpha[0] / (velocity * p.mass);
+    double b11 = p->c_alpha[0] * p->l_f / p->inertia_z;
+    double b21 = p->c_alpha[0] / (p->velocity * p->mass);
 
     double b[] = {b11, b21};
 
     //compute output values
-    dx[0] = a11 * xk[0] + a12 * xk[1] + b11 * delta;    // yaw acceleration [rad/s^2]
-    dx[1] = a21 * xk[0] + a22 * xk[1] + b21 * delta;    //sideslip angle velocity [rad/s]
+    dx[0] = a11 * x[0] + a12 * x[1] + b11 * p->delta;    // yaw acceleration [rad/s^2]
+    dx[1] = a21 * x[0] + a22 * x[1] + b21 * p->delta;    //sideslip angle velocity [rad/s]
 };
-
-void ode4(double dt, double xk[], double velocity, double delta, struct parameters p) {
-    double k1[2], k2[2], k3[2], k4[2];
-    double xtemp[2];
-    stm(k1, xk, velocity, delta, p);
-
-    xtemp[0] = xk[0] + 0.5 * dt * k1[0];
-    xtemp[1] = xk[1] + 0.5 * dt * k1[1];
-    stm(k2, xtemp, velocity, delta, p);
-
-    xtemp[0] = xk[0] + 0.5 * dt * k2[0];
-    xtemp[1] = xk[1] + 0.5 * dt * k2[1];
-    stm(k3, xtemp, velocity, delta, p);
-
-    xtemp[0] = xk[0] + dt * k3[0];
-    xtemp[1] = xk[1] + dt * k3[1];
-    stm(k4, xtemp, velocity, delta, p);
-
-    xk[0] += (dt/6.00) * (k1[0] + 2*k2[0] + 2*k3[0] + k4[0]);
-    xk[1] += (dt/6.00) * (k1[1] + 2*k2[1] + 2*k3[1] + k4[1]);
-}
