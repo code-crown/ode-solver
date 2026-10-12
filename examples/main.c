@@ -86,5 +86,5 @@ void stm(double t, const double x[], double dx[], double u[], void *parameters) 
     //compute output values
     dx[0] = a11 * x[0] + a12 * x[1] + b11 * u[0];       // yaw acceleration [rad/s^2]
     dx[1] = a21 * x[0] + a22 * x[1] + b21 * u[0];       //sideslip angle velocity [rad/s]
-    dx[3] = 0.00;                                       // longitudinal acceleration
+    dx[2] = 0.00;                                       // longitudinal acceleration
 };
