@@ -1,5 +1,5 @@
 #include <math.h>
-#include "odeslv.h"
+#include <odeslv.h>
 #include <stdio.h>
 
 
@@ -75,13 +75,9 @@ void stm(double t, const double x[], double dx[], double u[], void *parameters) 
     double a21 = -1.0 - (p->c_alpha[0] * p->l_f - p->c_alpha[1] * p->l_r)/(pow(x[2],2) * p->mass);
     double a22 = -(p->c_alpha[0]+ p->c_alpha[1])/(x[2] * p->mass);
 
-    double a[] = {a11, a12, a21, a22};
-
     // control array
     double b11 = p->c_alpha[0] * p->l_f / p->inertia_z;
     double b21 = p->c_alpha[0] / (x[2] * p->mass);
-
-    double b[] = {b11, b21};
 
     //compute output values
     dx[0] = a11 * x[0] + a12 * x[1] + b11 * u[0];       // yaw acceleration [rad/s^2]
