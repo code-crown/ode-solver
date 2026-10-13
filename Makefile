@@ -12,6 +12,14 @@ examples_dir = examples
 src = $(wildcard $(src_dir)/*.c)
 obj = $(patsubst $(src_dir)/%.c, $(obj_dir)/%.o, $(src))
 
+# Detect OS for shared library flags
+ifeq ($(shell uname -s),Darwin)
+    # macOS requires an install_name using @rpath so executables can find it
+    so_flags = -shared -Wl,-install_name,@rpath/libodeslv.so
+else
+    so_flags = -shared
+endif
+
 # target library
 lib = $(bin_dir)/libodeslv.so
 
@@ -31,7 +39,7 @@ $(obj_dir)/%.o: $(src_dir)/%.c | $(obj_dir)
 
 # create shared library (.so)
 $(lib): $(obj) | $(bin_dir)
-	$(cc) -shared -o $@ $^
+	$(cc) $(so_flags) -o $@ $^
 
 # --- explicit rules for examples ---
 # usage: type "make main" or "make xy" (if file is examples/xy.c)
@@ -42,4 +50,4 @@ $(lib): $(obj) | $(bin_dir)
 clean:
 	rm -rf $(obj_dir) $(bin_dir)
 
-.phony: all clean
+.PHONY: all clean
