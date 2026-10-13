@@ -12,12 +12,15 @@ examples_dir = examples
 src = $(wildcard $(src_dir)/*.c)
 obj = $(patsubst $(src_dir)/%.c, $(obj_dir)/%.o, $(src))
 
-# Detect OS for shared library flags
+# Detect OS for shared library and rpath flags
 ifeq ($(shell uname -s),Darwin)
-    # macOS requires an install_name using @rpath so executables can find it
+    # macOS requires an install_name and uses @loader_path for local libraries in bin/
     so_flags = -shared -Wl,-install_name,@rpath/libodeslv.so
+    rpath_flag = -Wl,-rpath,'@loader_path'
 else
+    # Linux uses -shared and $ORIGIN
     so_flags = -shared
+    rpath_flag = -Wl,-rpath,'$$ORIGIN'
 endif
 
 # target library
@@ -44,7 +47,7 @@ $(lib): $(obj) | $(bin_dir)
 # --- explicit rules for examples ---
 # usage: type "make main" or "make xy" (if file is examples/xy.c)
 %: $(examples_dir)/%.c $(lib) | $(bin_dir)
-	$(cc) $(cflags) $< -L$(bin_dir) -lodeslv -Wl,-rpath,'$$ORIGIN' -o $(bin_dir)/$@
+	$(cc) $(cflags) $< -L$(bin_dir) -lodeslv $(rpath_flag) -o $(bin_dir)/$@
 
 # clean up build files
 clean:
