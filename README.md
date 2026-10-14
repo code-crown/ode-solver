@@ -52,7 +52,7 @@ make all
 The project is set up to compile example programs located in the examples/ directory. For example, if you have an example source file named examples/main.c, you can build it by typing:
 
 ```console
-  make main
+make main
 ```
 
 
