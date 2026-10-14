@@ -43,8 +43,9 @@ Where:
 
 To compile the shared library (libodeslv.so) inside the bin/ directory, run:
 
+```console
 make all
-
+```
 
 2. Build and Run Examples
 
