@@ -1,56 +1,60 @@
 # compiler and flags
-cc = gcc
-cflags = -Wall -Wextra -std=c99 -O3 -fpic -Isrc
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c99 -O3 -Isrc
 
-# directories and files
-src_dir = src
-obj_dir = obj
-bin_dir = bin
-examples_dir = examples
+# directories
+SRC = src
+OBJ = obj
+EXMPL = examples
+BIN = bin
 
-# automatically find all library .c files in src directory
-src = $(wildcard $(src_dir)/*.c)
-obj = $(patsubst $(src_dir)/%.c, $(obj_dir)/%.o, $(src))
-
-# Detect OS for shared library and rpath flags
-ifeq ($(shell uname -s),Darwin)
-    # macOS requires an install_name and uses @loader_path for local libraries in bin/
-    so_flags = -shared -Wl,-install_name,@rpath/libodeslv.so
-    rpath_flag = -Wl,-rpath,'@loader_path'
+# os detection for file extension and directory creation
+ifeq ($(OS),Windows_NT)
+    MKDIR_OBJ = if not exist $(OBJ) mkdir $(OBJ)
+    MKDIR_BIN = if not exist $(BIN) mkdir $(BIN)
+    LIB_EXT = dll
+    LIB_LDFLAGS = -L$(BIN) -lodeslv
 else
-    # Linux uses -shared and $ORIGIN
-    so_flags = -shared
-    rpath_flag = -Wl,-rpath,'$$ORIGIN'
+    MKDIR_OBJ = mkdir -p $(OBJ)
+    MKDIR_BIN = mkdir -p $(BIN)
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Darwin)
+        LIB_EXT = dylib
+        LIB_LDFLAGS = -L$(BIN) -lodeslv -Wl,-rpath,@executable_path/$(BIN)
+    else
+        LIB_EXT = so
+        LIB_LDFLAGS = -L$(BIN) -lodeslv -Wl,-rpath,'$$ORIGIN/$(BIN)'
+    endif
 endif
 
-# target library
-lib = $(bin_dir)/libodeslv.so
+# name of the final shared library
+TARGET = $(BIN)/libodeslv.$(LIB_EXT)
 
-# default target: build only the library
-all: $(lib)
+# standard target
+all: $(TARGET)
 
-# create directories
-$(obj_dir):
-	mkdir -p $(obj_dir)
+# create object file for shared library
+$(OBJ)/odeslv.o: $(SRC)/odeslv.c
+	@$(MKDIR_OBJ)
+	$(CC) $(CFLAGS) -fpic -c $< -o $@
 
-$(bin_dir):
-	mkdir -p $(bin_dir)
+$(TARGET): $(OBJ)/odeslv.o
+	@$(MKDIR_BIN)
+	$(CC) -shared $< -o $@
 
-# compile each library .c file to a .o file
-$(obj_dir)/%.o: $(src_dir)/%.c | $(obj_dir)
-	$(cc) $(cflags) -c $< -o $@
 
-# create shared library (.so)
-$(lib): $(obj) | $(bin_dir)
-	$(cc) $(so_flags) -o $@ $^
+# build example programs using the shared library
+# dynamic target: make <name> (searches in examples/<name>.c)
+%: $(BIN)/%
+	@
 
-# --- explicit rules for examples ---
-# usage: type "make main" or "make xy" (if file is examples/xy.c)
-%: $(examples_dir)/%.c $(lib) | $(bin_dir)
-	$(cc) $(cflags) $< -L$(bin_dir) -lodeslv $(rpath_flag) -o $(bin_dir)/$@
+# rule: builds the example program and ensures the library exists first
+$(BIN)/%: $(EXMPL)/%.c $(TARGET)
+	@$(MKDIR_BIN)
+	$(CC) $(CFLAGS) $< $(LIB_LDFLAGS) -o $@
 
-# clean up build files
+# clean build artifacts
 clean:
-	rm -rf $(obj_dir) $(bin_dir)
+	rm -rf obj bin
 
 .PHONY: all clean
