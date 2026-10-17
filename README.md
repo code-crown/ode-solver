@@ -14,6 +14,7 @@ The repository includes:
 
 - Examples: Demonstration programs (e.g., single-track vehicle dynamics models) showing how to link against the library.
 
+
 ## What Type of Input Equations Are Required?
 
 The library expects systems formulated as a set of first-order ordinary differential equations in explicit form:
@@ -23,7 +24,6 @@ $$\frac{d\mathbf{x}}{dt} = \mathbf{f}(t, \mathbf{x}, \mathbf{u}, \text{parameter
 Your input function must conform to the ode_function signature defined in odeslv.h:
 
 typedef void(*ode_function)(double t, const double x[], double dx[], double u[], void *parameters);
-
 
 Where:
 
@@ -37,43 +37,44 @@ Where:
 
 - parameters: Pointer to a user-defined structure containing constant parameters (e.g., physical constants, vehicle dimensions, coefficients) (void *).
 
+
 ## How to Build and Use
 
 1. Build the Library
 
-To compile the shared library (libodeslv.so) inside the bin/ directory, run:
+    To compile the shared library (libodeslv.so) inside the bin/ directory, run:
 
-```console
-make all
-```
+    ```console
+    make
+    ```
 
 2. Build and Run Examples
 
-The project is set up to compile example programs located in the examples/ directory. For example, if you have an example source file named examples/main.c, you can build it by typing:
+    The project is set up to compile example programs located in the examples/ directory. For example, if you have an example source file named examples/main.c, you can build it by typing:
 
-```console
-make main
-```
+    ```console
+    make <name>
+    ```
 
 
-This command compiles main.c, links it dynamically against libodeslv.so, and places the executable binary inside bin/.
+    This command compiles <name>.c, links it dynamically against libodeslv.so, and places the executable binary inside bin/.
 
 3. Run the Binary
 
-Due to the built-in RPATH configuration ($ORIGIN on Linux, @loader_path on macOS), the binary can locate the shared library directly from the bin/ folder without needing manual LD_LIBRARY_PATH exports. Run it from the root directory or inside bin/:
+    Due to the built-in RPATH configuration ($ORIGIN on Linux, @loader_path on macOS), the binary can locate the shared library directly from the bin/ folder without needing manual LD_LIBRARY_PATH exports. Run it from the root directory or inside bin/:
 
-```console
-./bin/main
-```
+    ```console
+    ./bin/main
+    ```
 
 
 4. Cleanup
 
-To remove all compiled object files and binaries, run:
+    To remove all compiled object files and binaries, run:
 
-```console
-make clean
-```
+    ```console
+    make clean
+    ```
 
 
 ## License
