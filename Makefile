@@ -45,13 +45,13 @@ $(TARGET): $(OBJ)/odeslv.o
 
 # build example programs using the shared library
 # dynamic target: make <name> (searches in examples/<name>.c)
-%: $(BIN)/%
-	@
+# %: $(BIN)/%
+#	@
 
 # rule: builds the example program and ensures the library exists first
-$(BIN)/%: $(EXMPL)/%.c $(TARGET)
+%: $(EXMPL)/%.c $(TARGET)
 	@$(MKDIR_BIN)
-	$(CC) $(CFLAGS) $< $(LIB_LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $< $(LIB_LDFLAGS) -o $(BIN)/$@
 
 # clean build artifacts
 clean:
