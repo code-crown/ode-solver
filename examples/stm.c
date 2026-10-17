@@ -6,11 +6,11 @@
 struct parameters {
     double mass, l_f, l_r, inertia_z;
     double pky1, pky2, fz0;
-    double static_loads[4];
-    double c_alpha[2];      // cornering stiffness front and rear [rad/N]
+    double static_loads[4];             // wheel individual static loads [N]
+    double c_alpha[2];                  // cornering stiffness front and rear [rad/N]
 
     // scaling
-    double lambda_fz0, lambda_ky;      // scale factor of nominal (rated) load
+    double lambda_fz0, lambda_ky;       // scale factor of nominal (rated) load
 }bmw5;
 
 void stm(double t, const double x[], double dx[], double u[],void *parameters);
