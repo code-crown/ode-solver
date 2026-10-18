@@ -79,7 +79,7 @@ void ode45(ode_function fun, double *t, double xk[], double u[], int dim, double
         double diff = fabs(zk[i] - xk_temp[i]);
         if (diff < 1e-15) diff = 1e-15;
 
-        s[i] = pow(((epsilon * *dt) / (2 * diff)), 0.2);
+        s[i] = pow(((epsilon) / (2 * diff)), 0.2);
         if (s[i] < smin) { smin = s[i]; };
     }
 
