@@ -56,5 +56,5 @@ $(TARGET): $(OBJ)/odeslv.o
 # clean build artifacts
 clean:
 	rm -rf obj bin
-./
+
 .PHONY: all clean

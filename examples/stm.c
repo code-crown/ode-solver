@@ -35,17 +35,22 @@ int main(void) {
 
     calc_cornering_stiff(&bmw5);
 
-    double xk_ode4[] = {0.00, 0.00, 10.00};
     double xk_ode1[] = {0.00, 0.00, 10.00};
+    double xk_ode4[] = {0.00, 0.00, 10.00};
+    double xk_ode45[] = {0.00, 0.00, 10.00};
+    
     double time = 0.000;
-    double dt = 0.001;
+    double t_end = 0.2;   // [s]
+    double dt = 0.01;
     double u[] = {0.2}; // input steering angle at axle front [rad]
 
-    for (int i = 0; i <= 300; i++) {
-        ode4(stm, time, xk_ode4, u, 3, dt, &bmw5);
-        ode1(stm, time, xk_ode1, u, 3, dt, &bmw5);
-        printf("yaw rate: ode4 %f ode1 %f\t sideslip angle: %f\t time: %f\n", xk_ode4[0], xk_ode1[0], xk_ode4[1], time);
-        time += dt;
+    printf("%f\t%f\t%f\n", &time, dt, xk_ode45[0]);
+    for (int i = 0; i <= (t_end/dt); i++) {
+        // ode4(stm, time, xk_ode4, u, 3, &dt, &bmw5);
+        // ode1(stm, time, xk_ode1, u, 3, &dt, &bmw5);
+        // printf("yaw rate: ode4 %f ode1 %f\t sideslip angle: %f\t time: %f\n", xk_ode4[0], xk_ode1[0], xk_ode4[1], time);
+        ode45(stm, &time, xk_ode45, u, 3, &dt, &bmw5);
+        printf("%f\t%f\t%f\n", time, dt, xk_ode45[0]);
     };
 }
 
