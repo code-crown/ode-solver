@@ -43,7 +43,7 @@ void ode45(ode_function fun, double *t, double xk[], double u[], int dim, double
     double k1[dim], k2[dim], k3[dim], k4[dim], k5[dim], k6[dim], k7[dim];
     double xk_temp[dim], zk[dim], s[dim];
     double t_temp, dt_opt;
-    double smin = 1.00;
+    double smin = 1e9;
     const double epsilon = 1e-5;
 
     fun(*t, xk, k1, u, parameters); // k1
@@ -79,7 +79,7 @@ void ode45(ode_function fun, double *t, double xk[], double u[], int dim, double
         double diff = fabs(zk[i] - xk_temp[i]);
         if (diff < 1e-15) diff = 1e-15;
 
-        s[i] = pow(((epsilon) / (2 * diff)), 0.2);
+        s[i] = pow(((epsilon * *dt) / (2 * diff)), 0.2);
         if (s[i] < smin) { smin = s[i]; };
     }
 

@@ -40,12 +40,12 @@ int main(void) {
     double xk_ode45[] = {0.00, 0.00, 10.00};
     
     double time = 0.000;
-    double t_end = 0.2;   // [s]
+    double t_end = 2;   // [s]
     double dt = 0.01;
     double u[] = {0.2}; // input steering angle at axle front [rad]
 
-    printf("%f\t%f\t%f\n", &time, dt, xk_ode45[0]);
-    for (int i = 0; i <= (t_end/dt); i++) {
+    printf("%f\t%f\t%f\n", time, dt, xk_ode45[0]);
+    while (time <= t_end) {
         // ode4(stm, time, xk_ode4, u, 3, &dt, &bmw5);
         // ode1(stm, time, xk_ode1, u, 3, &dt, &bmw5);
         // printf("yaw rate: ode4 %f ode1 %f\t sideslip angle: %f\t time: %f\n", xk_ode4[0], xk_ode1[0], xk_ode4[1], time);
