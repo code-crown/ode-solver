@@ -18,16 +18,33 @@ void ode4(ode_function fun, double t, double xk[], double u[], int dim, double d
 
     fun(t, xk, k1, u, parameters);
 
-    for(int i = 0; i < dim; i++) { xk_temp[i] = xk[i] + 0.5 * dt * k1[i]; }
+    for(int i = 0; i < dim; i++) {xk_temp[i] = xk[i] + 0.5 * dt * k1[i];}
     fun(t + 0.5 * dt, xk_temp, k2, u, parameters);
 
-    for(int i = 0; i < dim; i++) { xk_temp[i] = xk[i] + 0.5 * dt * k2[i]; }
+    for(int i = 0; i < dim; i++) {xk_temp[i] = xk[i] + 0.5 * dt * k2[i];}
     fun(t + 0.5 * dt, xk_temp, k3, u, parameters);
 
-    for(int i = 0; i < dim; i++) { xk_temp[i] = xk[i] + dt * k3[i]; }
+    for(int i = 0; i < dim; i++) {xk_temp[i] = xk[i] + dt * k3[i];}
     fun(t + dt, xk_temp, k4, u, parameters);
 
     for(int i = 0; i < dim; i++) {
         xk[i] += (dt/6.00) * (k1[i] + 2*k2[i] + 2*k3[i] + k4[i]);
     }
+}
+
+// dormand prince method
+void ode45(ode_function fun, double t, double xk[], double u[], int dim, double dt, void *parameters) {
+    double k1[dim], k2[dim], k3[dim], k4[dim], k5[dim], k6[dim], k7[dim];
+    double xk_temp[dim];
+    double t_temp;
+
+    fun(t, xk, k1, u, parameters);
+
+    for(int i = 0; i < dim; i++) {xk_temp[i] = xk[i] + 0.2 * k1[i];};
+    t_temp = t + 0.2 * dt;
+    fun(t_temp, xk_temp, k2, u, parameters);
+
+    for(int i = 0; i < dim; i++) {xk_temp[i] = xk[i] + 0.075 * k1[i] + 0.225 * k2[i];}
+    t_temp = t + 0.3 * dt;
+
 }
