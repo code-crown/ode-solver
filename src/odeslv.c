@@ -15,7 +15,24 @@ void ode1(ode_function fun, double *t, double xk[], double u[], int dim, double 
     *t += *dt;
 }
 
-// 4th order runge kutta algorithm
+// heun
+void ode2(ode_function fun, double *t, double xk[], double u[], int dim, double *dt, void *parameters) {
+    double k1[dim], k2[dim];
+    double xk_temp[dim];
+
+    fun(*t, xk, k1, u, parameters);
+
+    for(int i = 0; i < dim; i++) {xk_temp[i] = xk[i] + 0.5 * (*dt);}
+    fun(*t + *dt, xk_temp, k2, u, parameters);
+
+    for(int i = 0; i < dim; i++) {
+        xk[i] += (*dt) * (0.5 * k1[i] + 0.5 * k2[i]);
+    }
+
+    *t += *dt;
+}
+
+// 4th order runge kutta
 void ode4(ode_function fun, double *t, double xk[], double u[], int dim, double *dt, void *parameters) {
     double k1[dim], k2[dim], k3[dim], k4[dim];
     double xk_temp[dim];
@@ -38,7 +55,7 @@ void ode4(ode_function fun, double *t, double xk[], double u[], int dim, double 
     *t += *dt;
 }
 
-// dormand prince method
+// dormand prince
 void ode45(ode_function fun, double *t, double xk[], double u[], int dim, double *dt, void *parameters) {
     double k1[dim], k2[dim], k3[dim], k4[dim], k5[dim], k6[dim], k7[dim];
     double xk_temp[dim], zk[dim], s[dim];
